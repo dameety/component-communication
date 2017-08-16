@@ -1,0 +1,161 @@
+After reading this post you should be able to get started with enabling your vuejs components to communicate with each other.
+
+This is simple to implement once you get a hang of it. Component commmunication is needed when you need a component to notify another component or components about an action that just took place.
+
+
+We are going to be making a component to check pin validity. The component will take in data and check if it's correct and take our user
+to the next stage or display an error. This communication between root instance and component is called parent-child communication.
+
+
+Let's begin; the html page.
+
+index.html...
+
+<!DOCTYPE html> 
+<html>
+
+    <head>
+        <title>Component communication</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-beta.27/css/uikit.min.css" />        
+    </head>    
+    
+    <body>
+        <div class="uk-section">
+            <div id="root" class="uk-container">
+                <pin @incorrect-pin="alertUser"></pin>
+            </div>
+        </div>
+
+        <script src="https://unpkg.com/vue"></script>
+        <script src="app.js"></script>
+    </body>
+
+</html>
+
+
+it's normal boilerplate with the pin component. 
+
+Below is our app.js file which contains vuejs code
+
+
+Vue.component('pin', {
+
+    template: '<input v-model="pin">',
+
+    data: {
+
+        return {
+            pin: ""
+        }
+
+    },
+
+    methods: {
+    }
+
+})
+
+
+new Vue ({
+
+    el: '#root',
+
+    methods: {
+
+    }
+
+})
+
+So we have the pin component with a input with v-model pin and also the root instance. Simple.
+
+
+Now we want to notify our root instance so it can show alert an error if an invalid pin code is used
+
+To get started, on using typing and leavin the input we want to call a method to check the pin validdaity.
+
+so pin component becomes
+
+Vue.component('pin', {
+
+    template: '<input placeholder="Enter your access pin here." v-model="pin" @blur="checkValidity">',
+
+    data: {
+
+        return [
+            pin: ""
+        ]
+
+    },
+
+    methods: {
+
+        checkValidity () {
+            if(this.pin !=== "12345670") {
+                this.$emit('incorrectPin');
+            } 
+            //make ajax request
+            //navigate to next page
+            //you can do whatever...
+        }
+    }
+
+})
+
+explanaton: on blur the checkValidity method is called which checks the validdaity of pin supplied and emits an event called incorrectPin
+this incorrectPin will be a method on the vue root instance(parent)
+
+so vue root becomes
+
+new Vue ({
+
+    el: '#root',
+
+    methods: {
+
+        incorrectPin () {
+            alert('You typed a wrong pin');
+        }
+
+    }
+
+})
+
+the incorrectPin on the root is called, this will display the error to the user.
+
+Update the index.html with a reference to the incorrectPin on the pin component
+
+<!DOCTYPE html>
+    
+    <html>
+    
+    <head>
+        <title>Component communication</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-beta.27/css/uikit.min.css" />        
+    </head>
+    
+    <body>
+
+        <div id="root" class="uk-container">
+        <pin @applied="incorrectPin"></pin>
+        </div>
+
+
+        //cdn to vuejs
+        <script src="app.js"></script>
+
+    </body>
+
+</html>
+
+
+Done. 
+
+To expand on this, you can also pass in data from the input to the root instance(parent).
+
+this.$emit.('applied', this.pin)
+
+So you can handle the pin data however you want on the root instance.
+
+We would talk about child to child or sibling communication next.
+
+Thank you.
